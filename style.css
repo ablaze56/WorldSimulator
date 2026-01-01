@@ -1,0 +1,587 @@
+:root {
+    --bg-dark: #0f172a;
+    --bg-panel: #1e293b;
+    --primary: #3b82f6;
+    --accent: #8b5cf6;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #334155;
+
+    --rarity-common: #22c55e;
+    --rarity-rare: #3b82f6;
+    --rarity-epic: #a855f7;
+    --rarity-legendary: #eab308;
+    /* Yellow */
+    --rarity-mythic: #ef4444;
+    --rarity-og: #ea580c;
+    --rarity-secret: #050505;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+.hidden {
+    display: none !important;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    overflow: hidden;
+    height: 100vh;
+}
+
+#game-ui {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+header {
+    background: var(--bg-panel);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+h1 {
+    font-weight: 800;
+    background: linear-gradient(to right, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.05em;
+}
+
+#stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.stat-box .label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.label-danger {
+    color: var(--rarity-mythic) !important;
+}
+
+.stat-box span:not(.label) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+#main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+#map {
+    flex: 2;
+    background: #000;
+    /* Pure black to hide everything outside world */
+    z-index: 1;
+    border: 2px solid var(--border);
+}
+
+#controls {
+    flex: 0 0 400px;
+    background: var(--bg-panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    overflow-y: auto;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+#buttons-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#click-btn {
+    flex: 2;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: 2px solid #047857;
+    color: #d1fae5;
+    padding: 1rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.1);
+    font-family: 'Courier New', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+#click-btn:active {
+    transform: scale(0.98);
+}
+
+#collection-btn {
+    flex: 1;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+#collection-btn:hover {
+    background: var(--border);
+}
+
+#shop-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 0;
+    /* Necessary for scroll */
+}
+
+h2,
+h3 {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.shop-header h2 {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin: 0;
+}
+
+#shop-timer {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+#country-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 0.5rem;
+}
+
+#country-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+#country-list::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 3px;
+}
+
+.country-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.country-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--primary);
+}
+
+.country-item.owned {
+    border-color: var(--accent);
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.country-item.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.country-item.out-of-stock {
+    opacity: 0.4;
+    filter: grayscale(1);
+    order: 9999;
+    /* Push to bottom if we display them */
+    display: none;
+    /* Hide out of stock completely? User asked: "stock resets". We can show only stock. */
+}
+
+.item-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-width: 60%;
+}
+
+.country-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    white-space: normal;
+}
+
+.country-rarity {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 800;
+    text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.3);
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.rarity-label-text {
+    display: inline-block;
+    line-height: 1;
+}
+
+.item-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cost {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.income {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+#collection-sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 0.5rem;
+}
+
+#collection-sidebar-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+#collection-sidebar-list::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 3px;
+}
+
+#collection-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.sidebar-close-btn {
+    position: absolute;
+    left: -2rem;
+    /* Stick out from the sidebar */
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-right: none;
+    color: var(--text-muted);
+    width: 2rem;
+    height: 4.5rem;
+    border-radius: 8px 0 0 8px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.2s;
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-close-btn:hover {
+    color: var(--accent);
+    background: var(--bg-panel);
+    width: 2.2rem;
+    left: -2.2rem;
+}
+
+
+/* Rarity Styles */
+.rarity-common {
+    color: var(--rarity-common);
+}
+
+.rarity-rare {
+    color: var(--rarity-rare);
+}
+
+.rarity-epic {
+    color: var(--rarity-epic);
+}
+
+.rarity-legendary {
+    color: var(--rarity-legendary);
+}
+
+.rarity-mythic {
+    color: var(--rarity-mythic);
+}
+
+.rarity-og {
+    color: var(--rarity-og);
+}
+
+.rarity-secret {
+    color: var(--rarity-secret);
+}
+
+/* Left Dash Indicator for All Rarities */
+.country-item::before,
+.collection-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    z-index: 10;
+}
+
+/* Background colors for the dashes */
+.country-item.rarity-common::before,
+.collection-card.rarity-common::before {
+    background: var(--rarity-common);
+}
+
+.country-item.rarity-rare::before,
+.collection-card.rarity-rare::before {
+    background: var(--rarity-rare);
+}
+
+.country-item.rarity-epic::before,
+.collection-card.rarity-epic::before {
+    background: var(--rarity-epic);
+}
+
+.country-item.rarity-legendary::before,
+.collection-card.rarity-legendary::before {
+    background: var(--rarity-legendary);
+}
+
+.country-item.rarity-mythic::before,
+.collection-card.rarity-mythic::before {
+    background: var(--rarity-mythic);
+}
+
+.country-item.rarity-og::before,
+.collection-card.rarity-og::before {
+    background: var(--rarity-og);
+}
+
+.country-item.rarity-secret::before,
+.collection-card.rarity-secret::before {
+    background: var(--rarity-secret);
+}
+
+/* Godly Special Style */
+.country-item.rarity-godly,
+.collection-card.rarity-godly {
+    box-shadow: none !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.country-item.rarity-godly::before,
+.collection-card.rarity-godly::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, #ff0000, #ffa500, #ffff00, #008000, #0000ff, #4b0082, #ee82ee);
+    background-size: 100% 200%;
+    animation: rainbow-scroll 2s linear infinite;
+    z-index: 2;
+}
+
+@keyframes rainbow-scroll {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    100% {
+        background-position: 0% 200%;
+    }
+}
+
+.rarity-godly .rarity-label-text {
+    background: linear-gradient(90deg, #ff0000, #ffa500, #ffff00, #008000, #0000ff, #4b0082, #ee82ee);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    animation: rainbow 3s linear infinite;
+    font-weight: 900;
+}
+
+@keyframes rainbow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.country-item.rarity-godly {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+
+#event-log {
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    max-height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+#log-list {
+    list-style: none;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+#log-list li {
+    color: var(--text-muted);
+}
+
+#log-list li.good {
+    color: var(--rarity-common);
+}
+
+#log-list li.bad {
+    color: var(--rarity-mythic);
+}
+
+#log-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+#log-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+}
+
+#collection-sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    /* Large gap between rectangles */
+    padding: 1rem;
+    /* Padding on all 4 sides of the container */
+}
+
+#collection-sidebar-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+#collection-sidebar-list::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 3px;
+}
+
+.collection-item {
+    padding: 1.25rem !important;
+    /* Larger padding for the rectangle */
+    min-height: 80px;
+    /* Ensure they are clearly visible and larger */
+    margin: 0 0.5rem;
+    /* Extra spacing from the sidebar edges */
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
+}
+
+.collection-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#collection-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
