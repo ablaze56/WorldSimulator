@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>World Simulator</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -43,47 +43,55 @@
     </header>
 
     <div id="main-container">
+        <!-- Zoom Controls Overlay -->
+        <div id="zoom-controls">
+            <button id="btn-zoom-in">+</button>
+            <button id="btn-zoom-out">-</button>
+        </div>
         <div id="map"></div>
 
-        <aside id="controls">
+        <!-- Action Area -->
+        <div id="action-area">
+            <button id="click-btn">$$$</button>
+        </div>
 
-            <div id="buttons-row">
-                <button id="click-btn">$$$</button>
-                <button id="collection-btn">Zbirka</button>
+        <!-- Tab Navigation -->
+        <div id="tabs-nav">
+            <button class="tab-btn active" data-tab="shop">Trgovina</button>
+            <button class="tab-btn" data-tab="collection">Zbirka</button>
+            <button class="tab-btn" data-tab="log">Dogodki</button>
+        </div>
+
+        <!-- Tab Content: Shop -->
+        <div id="tab-shop" class="tab-content active">
+            <div class="shop-header">
+                <h2>Trgovina Držav</h2>
+                <div id="shop-timer">01:30</div>
             </div>
+            <div id="country-list">
+                <!-- Country items will be injected here -->
+            </div>
+        </div>
 
-            <div id="shop-container">
-                <div class="shop-header">
-                    <h2>Trgovina Držav</h2>
-                    <div id="shop-timer">01:30</div>
-                </div>
-                <div id="country-list">
-                    <!-- Country items will be injected here -->
+        <!-- Tab Content: Collection -->
+        <div id="tab-collection" class="tab-content hidden">
+            <div class="shop-header">
+                <h2>Zbirka</h2>
+                <div id="collection-counter" style="color:var(--text-muted); font-size:0.8rem; font-weight:600;">0/0
                 </div>
             </div>
-
-            <div id="collection-container" class="hidden">
-                <div class="shop-header">
-                    <h2>Zbirka</h2>
-                    <div id="collection-counter" style="color:var(--text-muted); font-size:0.8rem; font-weight:600;">0/0
-                    </div>
-                </div>
-                <div id="collection-sidebar-list">
-                    <!-- Collection items will be injected here -->
-                </div>
+            <div id="collection-sidebar-list">
+                <!-- Collection items will be injected here -->
             </div>
+        </div>
 
-
-
-
-
-
-
-            <div id="event-log">
-                <h3>Dogodki</h3>
-                <ul id="log-list"></ul>
+        <!-- Tab Content: Log -->
+        <div id="tab-log" class="tab-content hidden">
+            <div class="shop-header">
+                <h2>Dogodki</h2>
             </div>
-        </aside>
+            <ul id="log-list"></ul>
+        </div>
     </div>
 </div>
 

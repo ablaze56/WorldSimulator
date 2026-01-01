@@ -88,6 +88,7 @@ const meteorOverlay = document.getElementById('meteor-overlay');
 
 async function initGame() {
     initMap();
+    setupZoomControls();
     setupEventListeners();
     await loadCountryData();
     replenishStock();
@@ -101,7 +102,7 @@ function initMap() {
     map = L.map('map', {
         center: [20, 0],
         zoom: 2,
-        zoomControl: true,
+        zoomControl: false, // Cleaner UI for mobile
         minZoom: 2,
         maxZoom: 6,
         attributionControl: false,
@@ -114,6 +115,23 @@ function initMap() {
         zoomSnap: 0.1,
         zoomDelta: 0.5
     });
+}
+
+function setupZoomControls() {
+    const btnIn = document.getElementById('btn-zoom-in');
+    const btnOut = document.getElementById('btn-zoom-out');
+
+    // Add checks just in case elements are missing
+    if (btnIn && btnOut) {
+        btnIn.addEventListener('click', () => {
+            if (map) map.zoomIn();
+        });
+        btnOut.addEventListener('click', () => {
+            if (map) map.zoomOut();
+        });
+        // Stop propagation to prevent map clicks underneath (essential for mobile)
+        L.DomEvent.disableClickPropagation(document.getElementById('zoom-controls'));
+    }
 }
 
 async function loadCountryData() {
@@ -258,22 +276,34 @@ function onEachFeature(feature, layer) {
 // --- Game Logic ---
 
 function setupEventListeners() {
-    document.getElementById('click-btn').addEventListener('click', () => { addMoney(10); });
+    // Click button
+    const clickBtn = document.getElementById('click-btn');
+    if (clickBtn) {
+        clickBtn.addEventListener('click', () => { addMoney(10); });
+        // Add minimal animation
+        clickBtn.addEventListener('mousedown', () => clickBtn.style.transform = 'scale(0.95)');
+        clickBtn.addEventListener('mouseup', () => clickBtn.style.transform = 'scale(1)');
+    }
 
-    const collectionBtn = document.getElementById('collection-btn');
-    collectionBtn.addEventListener('click', () => {
-        const shop = document.getElementById('shop-container');
-        const coll = document.getElementById('collection-container');
-        if (coll.classList.contains('hidden')) {
-            coll.classList.remove('hidden');
-            shop.classList.add('hidden');
-            collectionBtn.innerText = "Trgovina";
-            renderCollectionList();
-        } else {
-            coll.classList.add('hidden');
-            shop.classList.remove('hidden');
-            collectionBtn.innerText = "Zbirka";
-        }
+
+    // Tabs
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Deactivate all
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+
+            // Activate current
+            tab.classList.add('active');
+            const targetId = `tab-${tab.dataset.tab}`;
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) targetContent.classList.remove('hidden');
+
+            if (tab.dataset.tab === 'collection') {
+                renderCollectionList();
+            }
+        });
     });
 }
 
@@ -310,14 +340,21 @@ function startGameLoop() {
 // --- Meteor Shower Logic ---
 
 let nextMeteorTime;
+// meteorStage removed, single cycle
 
 function scheduleMeteorShower() {
-    // Initial schedule
-    nextMeteorTime = Date.now() + CONFIG.meteorIntervalMin;
-    setTimeout(triggerMeteorShower, CONFIG.meteorIntervalMin);
-
-    // Timer updater
+    startMeteorTimer();
     setInterval(updateMeteorTimer, 1000);
+}
+
+function startMeteorTimer() {
+    // Schedule the end of the current cycle
+    nextMeteorTime = Date.now() + CONFIG.meteorIntervalMin;
+    setTimeout(handleMeteorCycleEnd, CONFIG.meteorIntervalMin);
+}
+
+function handleMeteorCycleEnd() {
+    triggerMeteorShower();
 }
 
 function updateMeteorTimer() {
@@ -327,6 +364,7 @@ function updateMeteorTimer() {
     if (meteorOverlay.classList.contains('active')) {
         elem.textContent = "V TEKU";
         elem.style.color = "var(--rarity-mythic)";
+        elem.classList.add('blink');
         return;
     }
 
@@ -336,23 +374,28 @@ function updateMeteorTimer() {
     const seconds = Math.floor((diff % 60000) / 1000);
 
     elem.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    elem.style.color = "var(--rarity-mythic)";
+    elem.style.color = "var(--rarity-mythic)"; // Always red
+
+    // Blink in last 10 seconds only
+    if (diff < 10000 && diff > 0) {
+        elem.classList.add('blink');
+    } else {
+        elem.classList.remove('blink');
+    }
 }
 
 function triggerMeteorShower() {
-    // Reset timer for next shower immediately
-    nextMeteorTime = Date.now() + CONFIG.meteorIntervalMin;
-
     meteorOverlay.classList.add('active');
     logEvent("METEORSKI DEŽ SE JE ZAČEL!", "bad");
 
     setTimeout(() => {
         meteorOverlay.classList.remove('active');
         processMeteorHits();
-        logEvent("Meteorski dež se je končal. Začeto odštevanje za novega.", "neutral");
-        // No need to set nextMeteorTime here anymore
-        setTimeout(triggerMeteorShower, CONFIG.meteorIntervalMin);
-    }, 5000); // Overlay stays for 5s
+        logEvent("Meteorski dež se je končal.", "neutral");
+
+        // Start new cycle
+        startMeteorTimer();
+    }, 5000);
 }
 
 function processMeteorHits() {
@@ -361,7 +404,7 @@ function processMeteorHits() {
         if (Math.random() < CONFIG.meteorChance) {
             const country = state.countries[id];
             country.owned = false;
-            // Return to pool (not in stock immediately, just unowned)
+            // Return to pool (will appear randomly in future stocks)
             country.inStock = false;
             state.ownedCountries.delete(id);
             logEvent(`Meteor je uničil ${country.name}!`, 'bad');
@@ -423,10 +466,16 @@ function renderShop() {
     });
 }
 
-
+function renderCollection() {
+    // Optional: If you want to update collection in real time even if hidden
+    if (!document.getElementById('tab-collection').classList.contains('hidden')) {
+        renderCollectionList();
+    }
+}
 
 function renderCollectionList() {
     const grid = document.getElementById('collection-sidebar-list');
+    if (!grid) return;
     grid.innerHTML = '';
     const all = Object.values(state.countries).sort((a, b) => a.rarity.rank - b.rarity.rank);
 
@@ -449,7 +498,7 @@ function renderCollectionList() {
                 </div>
                 <div class="item-right">
                     <div class="income">+${formatMoney(c.income)}/s</div>
-                    ${!c.owned ? '<div style="font-size:0.75rem; color:var(--rarity-mythic); font-weight:800; margin-top:2px;">[ UNIČENO ]</div>' : ''}
+                    ${!c.owned ? '<div style="font-size:0.75rem; color:var(--rarity-mythic); font-weight:800; margin-top:2px;">(UNIČENO)</div>' : ''}
                 </div>
             `;
         } else {
